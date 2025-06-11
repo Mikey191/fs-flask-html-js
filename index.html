@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Список продуктов</title>
+  </head>
+  <body>
+    <h1>Добавить продукт</h1>
+    <input
+      type="text"
+      id="productTitle"
+      placeholder="Введите название продукта"
+    />
+    <button onclick="addProduct()">Добавить</button>
+
+    <h2>Все продукты</h2>
+    <button onclick="fetchProducts()">Показать продукты</button>
+    <ul id="productsList"></ul>
+
+    <script>
+      function addProduct() {
+        const title = document.getElementById("productTitle").value;
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://127.0.0.1:8000/add-product", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            alert("Продукт добавлен!");
+            document.getElementById("productTitle").value = "";
+          } else {
+            alert("Ошибка при добавлении продукта");
+          }
+        };
+
+        const data = JSON.stringify({ title: title });
+        xhr.send(data);
+      }
+
+      function fetchProducts() {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "http://127.0.0.1:8000/products", true);
+
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            const products = JSON.parse(xhr.responseText);
+            const list = document.getElementById("productsList");
+            list.innerHTML = "";
+            for (let product of products) {
+              const li = document.createElement("li");
+              li.textContent = `ID: ${product.id}, Название: ${product.title}`;
+              list.appendChild(li);
+            }
+          } else {
+            alert("Ошибка при загрузке продуктов");
+          }
+        };
+
+        xhr.send();
+      }
+    </script>
+  </body>
+</html>
